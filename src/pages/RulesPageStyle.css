@@ -1,0 +1,14 @@
+.rules-img {
+    transition: transform 150ms ease;
+}
+
+.rules-img:hover {
+    transform: rotate(1.5deg) scale(1.02);
+}
+
+@media (max-width: 768px) {
+    .rules-img {
+        max-width: 100%;
+        height: auto;
+    }
+}
