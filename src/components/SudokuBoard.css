@@ -1,0 +1,51 @@
+.sudoku-board-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem;
+}
+
+.sudoku-timer {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+}
+
+.sudoku-win-message {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: green;
+  border: 2px solid green;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+}
+
+.sudoku-board {
+  display: flex;
+  flex-direction: column;
+  border: 3px solid #333;
+}
+
+.sudoku-row {
+  display: flex;
+}
+
+.sudoku-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.sudoku-controls button {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+}
+
+.sudoku-controls button:hover {
+  background-color: #e0e0e0;
+}
