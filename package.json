@@ -1,11 +1,10 @@
 {
-  "name": "cs5610_project2_spr25",
-  "private": true,
+  "name": "sudoku-project3",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node server.js",
+    "server": "node --env-file=.env server.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
