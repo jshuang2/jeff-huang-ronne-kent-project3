@@ -1,16 +1,16 @@
 import { useContext } from "react";
-import { sudokuContext } from "./SudokuProvider";
+import { sudokuContext } from "./sudokuContext";
 import SudokuCell from "./SudokuCell";
 import "./SudokuBoard.css";
 
 export default function SudokuBoard() {
-
   const sudokuDataAndFuncs = useContext(sudokuContext);
   const cells = sudokuDataAndFuncs.cellsState;
   const won = sudokuDataAndFuncs.wonState;
   const timer = sudokuDataAndFuncs.timer;
   const resetGame = sudokuDataAndFuncs.resetGame;
   const startNewGame = sudokuDataAndFuncs.startNewGame;
+  const allowInteraction = sudokuDataAndFuncs.allowInteraction;
 
   const size = sudokuDataAndFuncs.size;
   const boxRows = size === 9 ? 3 : 2;
@@ -38,20 +38,18 @@ export default function SudokuBoard() {
 
   return (
     <div className="sudoku-board-container">
-
       <div className="sudoku-timer">{timer}</div>
 
-      {won && <div className="sudoku-win-message">🎉 Congratulations! You solved it!</div>}
+      {won && <div className="sudoku-win-message">Congratulations! You solved it!</div>}
 
-      <div className="sudoku-board">
-        {boardComponent}
-      </div>
+      <div className="sudoku-board">{boardComponent}</div>
 
       <div className="sudoku-controls">
-        <button onClick={resetGame}>Reset</button>
-        <button onClick={startNewGame}>New Game</button>
+        {allowInteraction && <button onClick={resetGame}>Reset</button>}
+        {allowInteraction && !sudokuDataAndFuncs.gameBacked && (
+          <button onClick={startNewGame}>New Game</button>
+        )}
       </div>
-
     </div>
   );
 }

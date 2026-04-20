@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { sudokuContext } from "./SudokuProvider";
+import { sudokuContext } from "./sudokuContext";
 import "./SudokuCell.css";
 
 export default function SudokuCell(props) {
@@ -10,6 +10,7 @@ export default function SudokuCell(props) {
   const selectCell = sudokuDataAndFuncs.selectCell;
   const enterValue = sudokuDataAndFuncs.enterValue;
   const deleteValue = sudokuDataAndFuncs.deleteValue;
+  const allowInteraction = sudokuDataAndFuncs.allowInteraction;
 
   const row = props.row;
   const col = props.col;
@@ -50,7 +51,7 @@ export default function SudokuCell(props) {
       style={borderStyle}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      tabIndex={cell.prefilled ? -1 : 0}
+      tabIndex={cell.prefilled || !allowInteraction ? -1 : 0}
     >
       {cell.value}
     </div>

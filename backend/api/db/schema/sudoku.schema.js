@@ -15,6 +15,10 @@ const SudokuSchema = new Schema({
         type: [[Number]],
         required: true,
     },
+    currentBoard: {
+        type: [[Number]],
+        required: true,
+    },
     solution: {
         type: [[Number]],
         required: true,
@@ -26,6 +30,10 @@ const SudokuSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now,
+    },
+    completedBy: {
+        type: [String],
+        default: [],
     },
 }, {
     collection: "sudoku"

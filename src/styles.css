@@ -87,6 +87,27 @@ h1 {
     font-weight: bold;
 }
 
+.navbar-user {
+    color: white;
+    font-family: var(--font-sans);
+    padding: 8px 12px;
+}
+
+.navbar-button {
+    background-color: #f0ead2;
+    color: #41521f;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+}
+
+.navbar-button:hover {
+    background-color: #e94560;
+    color: white;
+}
+
 .menu-toggle {
     display: none;
     background: none;
@@ -157,6 +178,42 @@ input:focus {
 
 .game-author {
     color: #479957;
+}
+
+.game-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+}
+
+.game-actions button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background-color: #41521f;
+    color: #f0ead2;
+    cursor: pointer;
+    font-family: var(--font-mono);
+}
+
+.game-actions button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+.page-error {
+    color: #b42318;
+    margin-bottom: 16px;
+}
+
+.game-meta {
+    margin-bottom: 20px;
+}
+
+.game-status {
+    max-width: 720px;
+    margin-bottom: 16px;
 }
 
 .form-container {

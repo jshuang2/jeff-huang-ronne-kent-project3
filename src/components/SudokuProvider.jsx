@@ -1,11 +1,35 @@
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { sudokuContext } from "./sudokuContext";
 
-export const sudokuContext = createContext();
+function cloneCells(cells) {
+  return cells.map((row) => row.map((cell) => ({ ...cell })));
+}
+
+function boardFromCells(cells) {
+  return cells.map((row) => row.map((cell) => Number(cell.value) || 0));
+}
+
+function cellsFromBoard(board, puzzle, solution) {
+  return board.map((row, rowIndex) =>
+    row.map((value, colIndex) => ({
+      value: value === 0 ? "" : String(value),
+      prefilled: puzzle[rowIndex][colIndex] !== 0,
+      isCorrect: value === 0 || value === solution[rowIndex][colIndex],
+      answer: solution[rowIndex][colIndex],
+    }))
+  );
+}
+
+function isSolved(board, solution) {
+  return board.every((row, rowIndex) =>
+    row.every((value, colIndex) => value === solution[rowIndex][colIndex])
+  );
+}
 
 export default function SudokuProvider(props) {
-
   const size = props.mode === "easy" ? 6 : 9;
   const filledCount = props.mode === "easy" ? 18 : 29;
+  const allowInteraction = props.allowInteraction ?? true;
 
   const [cellsState, setCellsState] = useState([]);
   const [originalState, setOriginalState] = useState([]);
@@ -14,17 +38,37 @@ export default function SudokuProvider(props) {
   const [secondsState, setSecondsState] = useState(0);
 
   useEffect(() => {
+    if (props.game) {
+      const activeBoard = props.showSolution
+        ? props.game.solution
+        : (props.game.currentBoard || props.game.puzzle);
+      const nextCells = cellsFromBoard(
+        activeBoard,
+        props.game.puzzle,
+        props.game.solution
+      );
+
+      setCellsState(nextCells);
+      setOriginalState(
+        cellsFromBoard(props.game.puzzle, props.game.puzzle, props.game.solution)
+      );
+      setSelectedState(null);
+      setWonState(props.showSolution || isSolved(activeBoard, props.game.solution));
+      setSecondsState(0);
+      return;
+    }
+
     startNewGame();
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.game, props.showSolution]);
 
   useEffect(() => {
     if (wonState) return;
     const interval = setInterval(() => {
-      setSecondsState(s => s + 1);
+      setSecondsState((s) => s + 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [wonState]);
-
 
   // --- Board Generation ---
 
@@ -53,9 +97,11 @@ export default function SudokuProvider(props) {
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
         if (board[row][col] === 0) {
-          const nums = [1,2,3,4,5,6,7,8,9].slice(0, size).sort(() => Math.random() - 0.5);
+          const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            .slice(0, size)
+            .sort(() => Math.random() - 0.5);
 
-          for (let num of nums) {
+          for (const num of nums) {
             if (isValid(board, row, col, num)) {
               board[row][col] = num;
               if (solveBoard(board)) return true;
@@ -109,6 +155,8 @@ export default function SudokuProvider(props) {
   // --- Game Actions ---
 
   function startNewGame() {
+    if (props.game) return;
+
     const { puzzle, solution } = generatePuzzle();
     const newCells = [];
 
@@ -126,31 +174,42 @@ export default function SudokuProvider(props) {
     }
 
     setCellsState(newCells);
-    setOriginalState(newCells.map(row => row.map(cell => ({ ...cell }))));
+    setOriginalState(cloneCells(newCells));
     setSelectedState(null);
     setWonState(false);
     setSecondsState(0);
   }
 
   function resetGame() {
-    setCellsState(originalState.map(row => row.map(cell => ({ ...cell }))));
+    if (!allowInteraction) return;
+
+    const resetCells = cloneCells(originalState);
+
+    setCellsState(resetCells);
     setSelectedState(null);
     setWonState(false);
     setSecondsState(0);
+
+    props.onBoardChange?.({
+      currentBoard: boardFromCells(resetCells),
+      completed: false,
+    });
   }
 
   function selectCell(row, col) {
+    if (!allowInteraction) return;
     if (wonState || cellsState[row][col].prefilled) return;
     setSelectedState({ row, col });
   }
 
   function enterValue(num) {
+    if (!allowInteraction) return;
     if (!selectedState || wonState) return;
 
     const { row, col } = selectedState;
     if (cellsState[row][col].prefilled) return;
 
-    const newCells = cellsState.map(r => r.map(c => ({ ...c })));
+    const newCells = cellsState.map((r) => r.map((c) => ({ ...c })));
     newCells[row][col].value = String(num);
 
     const numericBoard = newCells.map((r, ri) =>
@@ -160,22 +219,36 @@ export default function SudokuProvider(props) {
 
     setCellsState(newCells);
 
-    const allDone = newCells.every(row => row.every(cell => cell.value !== "" && cell.isCorrect));
+    const currentBoard = boardFromCells(newCells);
+    const allDone = newCells.every((boardRow) =>
+      boardRow.every((cell) => cell.value !== "" && cell.isCorrect)
+    );
+
+    props.onBoardChange?.({
+      currentBoard,
+      completed: allDone,
+    });
+
     if (allDone) setWonState(true);
   }
 
   function deleteValue() {
+    if (!allowInteraction) return;
     if (!selectedState || wonState) return;
 
     const { row, col } = selectedState;
     if (cellsState[row][col].prefilled) return;
 
-    const newCells = cellsState.map(r => r.map(c => ({ ...c })));
+    const newCells = cellsState.map((r) => r.map((c) => ({ ...c })));
     newCells[row][col].value = "";
     newCells[row][col].isCorrect = true;
     setCellsState(newCells);
-  }
 
+    props.onBoardChange?.({
+      currentBoard: boardFromCells(newCells),
+      completed: false,
+    });
+  }
 
   // --- Helpers ---
 
@@ -192,6 +265,8 @@ export default function SudokuProvider(props) {
     cellsState: cellsState,
     selectedState: selectedState,
     wonState: wonState,
+    allowInteraction: allowInteraction,
+    gameBacked: Boolean(props.game),
     size: size,
     timer: formatTime(secondsState),
     selectCell: selectCell,

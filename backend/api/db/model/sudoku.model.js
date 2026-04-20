@@ -8,7 +8,7 @@ export function insertSudoku(sudoku) {
 }
 
 export function getAllSudoku() {
-    return SudokuModel.find().exec();
+    return SudokuModel.find().sort({ createdAt: -1 }).exec();
 }
 
 export function findSudokuById(id) {
