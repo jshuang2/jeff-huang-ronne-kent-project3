@@ -11,6 +11,7 @@ import {
     generateUniqueGameName,
     isValidBoardShape,
 } from '../utils.js';
+import { updateHighscore } from './db/model/highscore.model.js';
 
 const router = express.Router();
 
@@ -58,6 +59,7 @@ router.get('/:gameId', async function(req, res) {
             createdBy: game.createdBy,
             createdAt: game.createdAt,
             completedBy: game.completedBy,
+            isCompleted: game.completedBy.includes(getCookieUsername(req) || ''),
         });
     } catch {
         return res.status(500).json({ error: 'Unable to load Sudoku game.' });
@@ -122,6 +124,12 @@ router.put('/:gameId', async function(req, res) {
             update.completedBy = game.completedBy.includes(username)
                 ? game.completedBy
                 : [...game.completedBy, username];
+
+            await updateHighscore(username, req.params.gameId, {
+                username,
+                gameId: req.params.gameId,
+                completed: true,
+            });
         }
 
         const updatedGame = await updateSudoku(req.params.gameId, update);

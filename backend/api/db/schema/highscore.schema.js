@@ -17,4 +17,6 @@ const HighscoreSchema = new Schema({
     collection: "highscores"
 });
 
+HighscoreSchema.index({ username: 1, gameId: 1 }, { unique: true });
+
 export default HighscoreSchema;

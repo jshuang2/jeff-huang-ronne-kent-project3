@@ -26,3 +26,24 @@ export function updateHighscore(username, gameId, update) {
         { new: true, upsert: true }
     ).exec();
 }
+
+export function getLeaderboard() {
+    return HighscoreModel.aggregate([
+        { $match: { completed: true } },
+        {
+            $group: {
+                _id: "$username",
+                wins: { $sum: 1 },
+            },
+        },
+        { $match: { wins: { $gt: 0 } } },
+        { $sort: { wins: -1, _id: 1 } },
+        {
+            $project: {
+                _id: 0,
+                username: "$_id",
+                wins: 1,
+            },
+        },
+    ]).exec();
+}

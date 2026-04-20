@@ -66,7 +66,7 @@ export default function SudokuGamePage() {
       return false;
     }
 
-    return game.completedBy?.includes(username);
+    return Boolean(game.isCompleted || game.completedBy?.includes(username));
   }, [game, username]);
 
   const allowInteraction = isLoggedIn && !isCompletedForUser;
