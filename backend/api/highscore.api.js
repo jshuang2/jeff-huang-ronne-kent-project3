@@ -1,4 +1,5 @@
 import express from 'express';
+import { verifyAuthCookie } from './user.api.js';
 import { findSudokuById } from './db/model/sudoku.model.js';
 import {
     findHighscoresByGameId,
@@ -9,8 +10,7 @@ import {
 const router = express.Router();
 
 function getCookieUsername(req) {
-    // TODO-JEFF: Align this with the final auth cookie/session implementation.
-    return req.cookies?.username || null;
+    return verifyAuthCookie(req);
 }
 
 // GET /api/highscore - get all high scores

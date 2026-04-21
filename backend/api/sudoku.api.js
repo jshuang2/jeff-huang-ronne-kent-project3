@@ -1,4 +1,5 @@
 import express from 'express';
+import { verifyAuthCookie } from './user.api.js';
 import {
     deleteSudoku,
     findSudokuById,
@@ -16,8 +17,7 @@ import { updateHighscore } from './db/model/highscore.model.js';
 const router = express.Router();
 
 function getCookieUsername(req) {
-    // TODO-JEFF: Align this with the real auth cookie shape once /api/user is implemented.
-    return req.cookies?.username || null;
+    return verifyAuthCookie(req);
 }
 
 function serializeGameSummary(game) {
