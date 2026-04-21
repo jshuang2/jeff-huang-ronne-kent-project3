@@ -2,11 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import SudokuProvider from "../components/SudokuProvider";
 import SudokuBoard from "../components/SudokuBoard";
+import { useAuth } from "../context/AuthContext";
 
 export default function SudokuGamePage() {
   const { gameId } = useParams();
+  const { username } = useAuth();
   const [game, setGame] = useState(null);
-  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -33,31 +34,7 @@ export default function SudokuGamePage() {
   }, [gameId]);
 
   useEffect(() => {
-    let ignore = false;
-
-    async function loadAuthState() {
-      try {
-        const authResponse = await fetch("/api/user/isLoggedIn", {
-          credentials: "include",
-        });
-        const authData = await authResponse.json().catch(() => ({}));
-
-        if (!ignore && authResponse.ok && authData.username) {
-          setUsername(authData.username);
-        }
-      } catch {
-        if (!ignore) {
-          setUsername("");
-        }
-      }
-    }
-
-    loadAuthState();
     loadGame();
-
-    return () => {
-      ignore = true;
-    };
   }, [loadGame]);
 
   const isLoggedIn = Boolean(username);
@@ -65,7 +42,6 @@ export default function SudokuGamePage() {
     if (!game || !username) {
       return false;
     }
-
     return Boolean(game.isCompleted || game.completedBy?.includes(username));
   }, [game, username]);
 
@@ -105,8 +81,6 @@ export default function SudokuGamePage() {
       return (
         <p className="game-status">
           Logged-out users can browse games, but interaction is disabled until login.
-          {" "}
-          <span>TODO-JEFF: wire this to the final auth/session API contract.</span>
         </p>
       );
     }
