@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [username, setUsername] = useState("");
+  const { username, logout } = useAuth();
 
   function toggleMenu() {
     setMenuOpen((prev) => !prev);
@@ -13,54 +14,16 @@ export default function Navbar() {
     setMenuOpen(false);
   }
 
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadAuthState() {
-      try {
-        const response = await fetch("/api/user/isLoggedIn", {
-          credentials: "include",
-        });
-        const data = await response.json().catch(() => ({}));
-
-        if (!ignore && response.ok && data.username) {
-          setUsername(data.username);
-        }
-      } catch {
-        if (!ignore) {
-          setUsername("");
-        }
-      }
-    }
-
-    loadAuthState();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
   async function handleLogout() {
-    // TODO-JEFF: The assignment specifies POST /api/user/logout, but the current
-    // backend router is still stubbed and uses DELETE. This keeps the navbar usable
-    // once the auth API is finalized.
     try {
-      let response = await fetch("/api/user/logout", {
+      await fetch("/api/user/logout", {
         method: "POST",
         credentials: "include",
       });
-
-      if (!response.ok) {
-        response = await fetch("/api/user/logout", {
-          method: "DELETE",
-          credentials: "include",
-        });
-      }
     } catch {
-      // Ignore network errors here so the UI can still clear local auth state.
+      // Ignore network errors
     }
-
-    setUsername("");
+    logout();
     closeMenu();
   }
 
